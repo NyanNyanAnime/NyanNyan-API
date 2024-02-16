@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"nyannyan/app/config"
 	"nyannyan/app/database"
-	// "nyannyan/app/route"
+	"nyannyan/app/route"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -20,7 +20,7 @@ func main() {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 
-	// route.New(e, dbMysql)
+	route.New(e, dbMysql)
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
 	}))

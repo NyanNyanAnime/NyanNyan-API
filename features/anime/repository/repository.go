@@ -6,6 +6,7 @@ import (
 	"nyannyan/features/anime/entity"
 	"nyannyan/features/anime/model"
 	"nyannyan/utils/constanta"
+	"nyannyan/utils/pagination"
 	"nyannyan/utils/storage"
 
 	"gorm.io/gorm"
@@ -21,11 +22,46 @@ func NewAnimeRepository(db *gorm.DB) entity.AnimeRepositoryInterface {
 	}
 }
 
+// CreateGenre implements entity.AnimeRepositoryInterface.
+func (ar *animeRepository) CreateGenre(data []entity.GenreCore) error {
+	request := entity.ListMapCoreGenreToModelGenre(data)
+
+	tx := ar.db.Create(&request)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
+// UpdateGenreById implements entity.AnimeRepositoryInterface.
+func (ar *animeRepository) UpdateGenreById(id string, data entity.GenreCore) error {
+	request := entity.MapCoreGenreToModelGenre(data)
+
+	tx := ar.db.Where("id = ?", id).Updates(&request)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New(constanta.ERROR_DATA_NOT_FOUND)
+	}
+
+	return nil
+}
+
 // CreateAnime implements entity.AnimeRepositoryInterface.
 func (ar *animeRepository) CreateAnime(image *multipart.FileHeader, data entity.AnimeCore) error {
 	request := entity.MapCoreAnimeToModelAnime(data)
 
-	imageURL, err := storage.UploadImage(image)
+	// Upload image to Cloudinary
+	file, err := image.Open()
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	imageURL, err := storage.UploadToCloudinary(file, image.Filename)
 	if err != nil {
 		return err
 	}
@@ -56,23 +92,39 @@ func (ar *animeRepository) DeleteAnimeById(id string) error {
 }
 
 // GetAllAnime implements entity.AnimeRepositoryInterface.
-func (ar *animeRepository) GetAllAnime() ([]entity.AnimeCore, error) {
+func (ar *animeRepository) GetAllAnime(page, limit int, search string) ([]entity.AnimeCore, pagination.PageInfo, int, error) {
 	dataAnime := []model.Anime{}
 
-	err := ar.db.Find(&dataAnime).Error
-	if err != nil {
-		return nil, err
+	offset := (page - 1) * limit
+	query := ar.db.Model(&model.Anime{}).Preload("Genre")
+
+	if search != "" {
+		query = query.Where("title LIKE ? or genre LIKE ? ", "%"+search+"%", "%"+search+"%")
+	}
+
+	var totalCount int64
+	tx := query.Count(&totalCount).Find(&dataAnime)
+	if tx.Error != nil {
+		return nil, pagination.PageInfo{}, 0, tx.Error
+	}
+
+	query = query.Offset(offset).Limit(limit)
+	tx = query.Find(&dataAnime)
+	if tx.Error != nil {
+		return nil, pagination.PageInfo{}, 0, tx.Error
 	}
 
 	dataResponse := entity.ListModelAnimeToCoreAnime(dataAnime)
-	return dataResponse, nil
+	pageInfo := pagination.CalculateData(int(totalCount), limit, page)
+
+	return dataResponse, pageInfo, int(totalCount), nil
 }
 
 // GetAnimeById implements entity.AnimeRepositoryInterface.
 func (ar *animeRepository) GetAnimeById(id string) (entity.AnimeCore, error) {
 	dataAnime := model.Anime{}
 
-	tx := ar.db.Preload("Schedule").Where("id = ?", id).First(&dataAnime)
+	tx := ar.db.Preload("Genre").Where("id = ?", id).First(&dataAnime)
 	if tx.Error != nil {
 		return entity.AnimeCore{}, tx.Error
 	}
@@ -97,22 +149,38 @@ func (ar *animeRepository) UpdateAnimeById(id string, image *multipart.FileHeade
 	}
 
 	if image != nil {
-		imageURL, uploadErr := storage.UploadImage(image)
+		file, err := image.Open()
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		imageURL, uploadErr := storage.UploadToCloudinary(file, image.Filename)
 		if uploadErr != nil {
 			return uploadErr
 		}
 		request.Image = imageURL
+	}
+
+	// Only update the image if the `image` parameter is not nil
+	if image != nil {
+		tx = ar.db.Where("id = ?", id).Updates(&request)
+		if tx.Error != nil {
+			return tx.Error
+		}
+
+		if tx.RowsAffected == 0 {
+			return errors.New(constanta.ERROR_DATA_NOT_FOUND)
+		}
 	} else {
-		request.Image = dataAnime.Image
-	}
+		tx = ar.db.Where("id = ?", id).Omit("image").Updates(&request)
+		if tx.Error != nil {
+			return tx.Error
+		}
 
-	tx = ar.db.Where("id = ?", id).Updates(&request)
-	if tx.Error != nil {
-		return tx.Error
-	}
-
-	if tx.RowsAffected == 0 {
-		return errors.New(constanta.ERROR_DATA_NOT_FOUND)
+		if tx.RowsAffected == 0 {
+			return errors.New(constanta.ERROR_DATA_NOT_FOUND)
+		}
 	}
 
 	return nil

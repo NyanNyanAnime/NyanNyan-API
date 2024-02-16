@@ -13,7 +13,8 @@ func AnimeRequestToCoreAnime(data AnimeRequest) entity.AnimeCore {
 
 func GenreRequestToCoreGenre(data GenreRequest) entity.GenreCore {
 	return entity.GenreCore{
-		Genre: data.Genre,
+		Genre:   data.Genre,
+		AnimeId: data.AnimeId,
 	}
 }
 
@@ -24,4 +25,15 @@ func ListGenreRequestToCoreGenre(data []GenreRequest) []entity.GenreCore {
 		list = append(list, result)
 	}
 	return list
+}
+
+func GenresRequestToCoreGenre(request GenresRequest) []entity.GenreCore {
+    genres := []entity.GenreCore{}
+    for _, genre := range request.Genres {
+        genres = append(genres, entity.GenreCore{
+            Genre:   genre,
+            AnimeId: request.AnimeId,
+        })
+    }
+    return genres
 }

@@ -7,6 +7,7 @@ import (
 	"nyannyan/features/anime/entity"
 	"nyannyan/utils/constanta"
 	"nyannyan/utils/helper"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -22,10 +23,27 @@ func NewAnimeController(anime entity.AnimeServiceInterface) *animeController {
 	}
 }
 
+func (ac *animeController) CreateGenre(e echo.Context) error {
+
+	input := request.GenresRequest{}
+	err := e.Bind(&input)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, helper.ErrorResponse(err.Error()))
+	}
+
+	request := request.GenresRequestToCoreGenre(input)
+	err = ac.animeService.CreateGenre(request)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, helper.ErrorResponse(err.Error()))
+	}
+
+	return e.JSON(http.StatusCreated, helper.SuccessResponse(constanta.SUCCESS_CREATE_DATA))
+}
+
 func (ac *animeController) CreateAnime(e echo.Context) error {
 
 	input := request.AnimeRequest{}
-	err := helper.BindFormData(e, &input)
+	err := e.Bind(&input)
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, helper.ErrorResponse(err.Error()))
 	}
@@ -48,17 +66,22 @@ func (ac *animeController) CreateAnime(e echo.Context) error {
 }
 
 func (ah *animeController) GetAllAnime(e echo.Context) error {
-	result, err := ah.animeService.GetAllAnime()
+
+	search := e.QueryParam("search")
+	page, _ := strconv.Atoi(e.QueryParam("page"))
+	limit, _ := strconv.Atoi(e.QueryParam("limit"))
+
+	anime, paginationInfo, count, err := ah.animeService.GetAllAnime(page, limit, search)
 	if err != nil {
 		return e.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	if len(result) == 0 {
+	if len(anime) == 0 {
 		return e.JSON(http.StatusOK, helper.SuccessResponse(constanta.SUCCESS_NULL))
 	}
 
-	response := response.ListCoreAnimeToAnimeResponse(result)
-	return e.JSON(http.StatusOK, helper.SuccessWithDataResponse(constanta.SUCCESS_GET_DATA, response))
+	response := response.ListCoreAnimeToAnimeResponse(anime)
+	return e.JSON(http.StatusOK, helper.SuccessWithPagnationAndCount(constanta.SUCCESS_GET_DATA, response, paginationInfo, count))
 }
 
 func (ac *animeController) GetAnimeById(e echo.Context) error {
@@ -110,4 +133,24 @@ func (ac *animeController) DeleteAnimeById(e echo.Context) error {
 	}
 
 	return e.JSON(http.StatusOK, helper.SuccessResponse(constanta.SUCCESS_DELETE_DATA))
+}
+
+func (uh *animeController) UpdateGenreById(e echo.Context) error {
+	input := request.GenreRequest{}
+
+	errBind := helper.DecodeJSON(e, &input)
+	if errBind != nil {
+		return e.JSON(http.StatusBadRequest, helper.ErrorResponse(errBind.Error()))
+	}
+
+	request := request.GenreRequestToCoreGenre(input)
+
+	id := e.Param("id")
+	errUpdate := uh.animeService.UpdateGenreById(id, request)
+	if errUpdate != nil {
+		return e.JSON(http.StatusBadRequest, helper.ErrorResponse(errUpdate.Error()))
+	}
+
+	return e.JSON(http.StatusOK, helper.SuccessResponse(constanta.SUCCESS_UPDATE_DATA))
+
 }

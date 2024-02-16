@@ -8,5 +8,12 @@ type AnimeRequest struct {
 }
 
 type GenreRequest struct {
-	Genre string `json:"genre" form:"genre"`
+	Genre   string `json:"genre" form:"genre"`
+	AnimeId string `json:"anime_id" form:"anime_id"`
 }
+
+type GenresRequest struct {
+	Genres  []string `json:"genres" form:"genres"`
+	AnimeId string   `json:"anime_id" form:"anime_id"`
+}
+
