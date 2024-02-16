@@ -16,6 +16,7 @@ type animeRepository struct {
 	db *gorm.DB
 }
 
+
 func NewAnimeRepository(db *gorm.DB) entity.AnimeRepositoryInterface {
 	return &animeRepository{
 		db: db,
@@ -29,6 +30,22 @@ func (ar *animeRepository) CreateGenre(data []entity.GenreCore) error {
 	tx := ar.db.Create(&request)
 	if tx.Error != nil {
 		return tx.Error
+	}
+
+	return nil
+}
+
+// DeleteGenreById implements entity.AnimeRepositoryInterface.
+func (ar *animeRepository) DeleteGenreById(id string) error {
+	genreData := model.Genre{}
+
+	tx := ar.db.Where("id = ?", id).Delete(&genreData)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New(constanta.ERROR_DATA_NOT_FOUND)
 	}
 
 	return nil

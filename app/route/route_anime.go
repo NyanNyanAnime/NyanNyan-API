@@ -24,4 +24,5 @@ func RouteAnime(e *echo.Group, db *gorm.DB) {
 	genre := e.Group("/genre")
 	genre.POST("", animeController.CreateGenre)
 	genre.PATCH("/:id", animeController.UpdateGenreById)
+	genre.DELETE("/:id", animeController.DeleteGenreById)
 }

@@ -14,6 +14,7 @@ type AnimeRepositoryInterface interface {
 	DeleteAnimeById(id string) error
 	CreateGenre(data []GenreCore) error
 	UpdateGenreById(id string, data GenreCore) error
+	DeleteGenreById(id string) error
 }
 
 type AnimeServiceInterface interface {
@@ -24,4 +25,5 @@ type AnimeServiceInterface interface {
 	DeleteAnimeById(id string) error
 	CreateGenre(data []GenreCore) error
 	UpdateGenreById(id string, data GenreCore) error
+	DeleteGenreById(id string) error
 }
