@@ -10,7 +10,6 @@ import (
 )
 
 func RouteAnime(e *echo.Group, db *gorm.DB) {
-	// User
 	animeRepository := repository.NewAnimeRepository(db)
 	animeService := service.NewAnimeService(animeRepository)
 	animeController := controller.NewAnimeController(animeService)
@@ -22,4 +21,7 @@ func RouteAnime(e *echo.Group, db *gorm.DB) {
 	anime.PUT("/:id", animeController.UpdateAnimeById)
 	anime.DELETE("/:id", animeController.DeleteAnimeById)
 
+	genre := e.Group("/genre")
+	genre.POST("", animeController.CreateGenre)
+	genre.PATCH("/:id", animeController.UpdateGenreById)
 }

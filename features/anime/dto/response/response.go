@@ -5,7 +5,7 @@ type AnimeResponse struct {
 	Title    string          `json:"title"`
 	Synopsis string          `json:"synopsis"`
 	Image    string          `json:"image"`
-	Genre    []GenreResponse `json:"genre"`
+	Genres   []GenreResponse `json:"genres"`
 }
 
 type GenreResponse struct {

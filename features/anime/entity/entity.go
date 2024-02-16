@@ -20,7 +20,16 @@ type AnimeCore struct {
 type GenreCore struct {
 	Id        string
 	Genre     string
-	GenreId   string
+	AnimeId   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
+}
+
+type GenresCore struct {
+	Id        string
+	Genre     []string
+	AnimeId   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt

@@ -26,7 +26,7 @@ func MapCoreGenreToModelGenre(data GenreCore) model.Genre {
 	return model.Genre{
 		Id:      data.Id,
 		Genre:   data.Genre,
-		GenreId: data.GenreId,
+		AnimeId: data.AnimeId,
 	}
 }
 
@@ -56,7 +56,7 @@ func ModelGenreToCoreGenre(data model.Genre) GenreCore {
 	return GenreCore{
 		Id:        data.Id,
 		Genre:     data.Genre,
-		GenreId:   data.GenreId,
+		AnimeId:   data.AnimeId,
 		CreatedAt: data.CreatedAt,
 		UpdatedAt: data.UpdatedAt,
 	}

@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"nyannyan/features/anime/entity"
 	"nyannyan/utils/constanta"
+	"nyannyan/utils/pagination"
 	"nyannyan/utils/validation"
 )
 
@@ -16,6 +17,41 @@ func NewAnimeService(anime entity.AnimeRepositoryInterface) entity.AnimeServiceI
 	return &animeService{
 		animeRepository: anime,
 	}
+}
+
+// CreateGenre implements entity.AnimeServiceInterface.
+func (as *animeService) CreateGenre(data []entity.GenreCore) error {
+	for _, genre := range data {
+        if errEmpty := validation.CheckDataEmpty(genre.Genre, genre.AnimeId); errEmpty != nil {
+            return errEmpty
+        }
+    }
+
+	errCreate := as.animeRepository.CreateGenre(data)
+	if errCreate != nil {
+		return errCreate
+	}
+
+	return nil
+}
+
+// UpdateGenreById implements entity.AnimeServiceInterface.
+func (as *animeService) UpdateGenreById(id string, data entity.GenreCore) error {
+	if id == "" {
+		return errors.New(constanta.ERROR_ID_INVALID)
+	}
+
+	errEmpty := validation.CheckDataEmpty(data.Genre)
+	if errEmpty != nil {
+		return errEmpty
+	}
+
+	errUpdate := as.animeRepository.UpdateGenreById(id, data)
+	if errUpdate != nil {
+		return errUpdate
+	}
+
+	return nil
 }
 
 // CreateAnime implements entity.AnimeServiceInterface.
@@ -43,7 +79,7 @@ func (as *animeService) CreateAnime(image *multipart.FileHeader, data entity.Ani
 }
 
 // DeleteAnimeById implements entity.AnimeServiceInterface.
-func (as*animeService) DeleteAnimeById(id string) error {
+func (as *animeService) DeleteAnimeById(id string) error {
 	if id == "" {
 		return errors.New(constanta.ERROR_ID_INVALID)
 	}
@@ -57,13 +93,19 @@ func (as*animeService) DeleteAnimeById(id string) error {
 }
 
 // GetAllAnime implements entity.AnimeServiceInterface.
-func (as *animeService) GetAllAnime() ([]entity.AnimeCore, error) {
-	anime, err := as.animeRepository.GetAllAnime()
-	if err != nil {
-		return nil, err
+func (as *animeService) GetAllAnime(page, limit int, search string) ([]entity.AnimeCore, pagination.PageInfo, int, error) {
+	if limit > 10 {
+		return nil, pagination.PageInfo{}, 0, errors.New("the limit cannot be more than 10")
 	}
 
-	return anime, nil
+	page, limit = validation.ValidateCountLimitAndPage(page, limit)
+
+	animeCores, pageInfo, count, err := as.animeRepository.GetAllAnime(page, limit, search)
+	if err != nil {
+		return nil, pagination.PageInfo{}, 0, err
+	}
+
+	return animeCores, pageInfo, count, nil
 }
 
 // GetAnimeById implements entity.AnimeServiceInterface.
@@ -82,21 +124,20 @@ func (as *animeService) GetAnimeById(id string) (entity.AnimeCore, error) {
 
 // UpdateAnimeById implements entity.AnimeServiceInterface.
 func (as *animeService) UpdateAnimeById(id string, image *multipart.FileHeader, updated entity.AnimeCore) error {
-	errEmpty := validation.CheckDataEmpty(updated.Title, updated.Synopsis)
-	if errEmpty != nil {
-		return errEmpty
+	if id == "" {
+		return errors.New(constanta.ERROR_ID_INVALID)
 	}
 
-	_, err := as.animeRepository.GetAnimeByTitle(updated.Title)
-	if err == nil {
-		return errors.New("title is already in use")
-	}
+	// errEmpty := validation.CheckDataEmpty(updated.Title, updated.Synopsis)
+	// if errEmpty != nil {
+	// 	return errEmpty
+	// }
 
-	if image.Size > 10*1024*1024 {
+	if image != nil && image.Size > 10*1024*1024 {
 		return errors.New("image file size should be less than 10 MB")
 	}
 
-	err = as.animeRepository.UpdateAnimeById(id, image, updated)
+	err := as.animeRepository.UpdateAnimeById(id, image, updated)
 	if err != nil {
 		return err
 	}

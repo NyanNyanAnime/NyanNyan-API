@@ -7,7 +7,8 @@ func CoreAnimeToAnimeResponse(data entity.AnimeCore) AnimeResponse {
 		Id:       data.Id,
 		Title:    data.Title,
 		Synopsis: data.Synopsis,
-		Genre:    ListCoreGenreToGenreRequest(data.Genre),
+		Image:    data.Image,
+		Genres:   ListCoreGenreToGenreRequest(data.Genre),
 	}
 }
 
