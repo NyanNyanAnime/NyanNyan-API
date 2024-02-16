@@ -22,14 +22,28 @@ func NewAnimeService(anime entity.AnimeRepositoryInterface) entity.AnimeServiceI
 // CreateGenre implements entity.AnimeServiceInterface.
 func (as *animeService) CreateGenre(data []entity.GenreCore) error {
 	for _, genre := range data {
-        if errEmpty := validation.CheckDataEmpty(genre.Genre, genre.AnimeId); errEmpty != nil {
-            return errEmpty
-        }
-    }
+		if errEmpty := validation.CheckDataEmpty(genre.Genre, genre.AnimeId); errEmpty != nil {
+			return errEmpty
+		}
+	}
 
 	errCreate := as.animeRepository.CreateGenre(data)
 	if errCreate != nil {
 		return errCreate
+	}
+
+	return nil
+}
+
+// DeleteGenreById implements entity.AnimeServiceInterface.
+func (as *animeService) DeleteGenreById(id string) error {
+	if id == "" {
+		return errors.New(constanta.ERROR_ID_INVALID)
+	}
+
+	err := as.animeRepository.DeleteGenreById(id)
+	if err != nil {
+		return err
 	}
 
 	return nil
