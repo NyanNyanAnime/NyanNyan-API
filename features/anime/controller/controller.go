@@ -154,3 +154,16 @@ func (uh *animeController) UpdateGenreById(e echo.Context) error {
 	return e.JSON(http.StatusOK, helper.SuccessResponse(constanta.SUCCESS_UPDATE_DATA))
 
 }
+
+func (ac *animeController) DeleteGenreById(e echo.Context) error {
+	id := e.Param("id")
+	err := ac.animeService.DeleteGenreById(id)
+	if err != nil {
+		if strings.Contains(err.Error(), constanta.ERROR_RECORD_NOT_FOUND) {
+			return e.JSON(http.StatusNotFound, helper.ErrorResponse(constanta.ERROR_DATA_NOT_FOUND))
+		}
+		return e.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+	}
+
+	return e.JSON(http.StatusOK, helper.SuccessResponse(constanta.SUCCESS_DELETE_DATA))
+}

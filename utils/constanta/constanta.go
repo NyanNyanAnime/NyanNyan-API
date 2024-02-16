@@ -14,6 +14,6 @@ const (
 	SUCCESS_CREATE_DATA = "success create data"
 	SUCCESS_GET_DATA    = "success get data"
 	SUCCESS_UPDATE_DATA = "success update data"
-	SUCCESS_DELETE_DATA = "succss delete data"
+	SUCCESS_DELETE_DATA = "success delete data"
 	SUCCESS_NULL        = "data not yet available"
 )
