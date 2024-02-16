@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"nyannyan/app/config"
+	"nyannyan/features/anime/model"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,5 +23,5 @@ func InitDBMysql(cfg *config.AppConfig) *gorm.DB {
 }
 
 func InitMigrationMysql(db *gorm.DB) {
-	// db.AutoMigrate(&achievement.Achievement{})
+	db.AutoMigrate(&model.Anime{}, &model.Genre{})
 }
