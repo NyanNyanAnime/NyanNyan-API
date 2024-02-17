@@ -10,6 +10,13 @@ type Anime struct {
 	Id        string `gorm:"primaryKey;type:varchar(191)"`
 	Title     string `gorm:"not null;unique"`
 	Synopsis  string `gorm:"not null"`
+	Type      string
+	Episodes  int
+	Premiered string
+	Aired     string
+	Studios   string
+	Duration  string
+	Rating    string
 	Image     string
 	Genre     []Genre `gorm:"foreignKey:AnimeId;constraint:OnDelete:CASCADE"`
 	CreatedAt time.Time

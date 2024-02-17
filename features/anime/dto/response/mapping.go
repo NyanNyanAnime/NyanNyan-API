@@ -4,11 +4,18 @@ import "nyannyan/features/anime/entity"
 
 func CoreAnimeToAnimeResponse(data entity.AnimeCore) AnimeResponse {
 	return AnimeResponse{
-		Id:       data.Id,
-		Title:    data.Title,
-		Synopsis: data.Synopsis,
-		Image:    data.Image,
-		Genres:   ListCoreGenreToGenreRequest(data.Genre),
+		Id:        data.Id,
+		Title:     data.Title,
+		Synopsis:  data.Synopsis,
+		Type:      data.Type,
+		Episodes:  data.Episodes,
+		Premiered: data.Premiered,
+		Aired:     data.Aired,
+		Studios:   data.Studios,
+		Duration:  data.Duration,
+		Rating:    data.Rating,
+		Image:     data.Image,
+		Genres:    ListCoreGenreToGenreRequest(data.Genre),
 	}
 }
 
