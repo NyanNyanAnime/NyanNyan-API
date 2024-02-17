@@ -4,10 +4,17 @@ import "nyannyan/features/anime/entity"
 
 func AnimeRequestToCoreAnime(data AnimeRequest) entity.AnimeCore {
 	return entity.AnimeCore{
-		Title:    data.Title,
-		Synopsis: data.Synopsis,
-		Image:    data.Image,
-		Genre:    ListGenreRequestToCoreGenre(data.Genre),
+		Title:     data.Title,
+		Synopsis:  data.Synopsis,
+		Type:      data.Type,
+		Episodes:  data.Episodes,
+		Premiered: data.Premiered,
+		Aired:     data.Aired,
+		Studios:   data.Studios,
+		Duration:  data.Duration,
+		Rating:    data.Rating,
+		Image:     data.Image,
+		Genre:     ListGenreRequestToCoreGenre(data.Genre),
 	}
 }
 
@@ -28,12 +35,12 @@ func ListGenreRequestToCoreGenre(data []GenreRequest) []entity.GenreCore {
 }
 
 func GenresRequestToCoreGenre(request GenresRequest) []entity.GenreCore {
-    genres := []entity.GenreCore{}
-    for _, genre := range request.Genres {
-        genres = append(genres, entity.GenreCore{
-            Genre:   genre,
-            AnimeId: request.AnimeId,
-        })
-    }
-    return genres
+	genres := []entity.GenreCore{}
+	for _, genre := range request.Genres {
+		genres = append(genres, entity.GenreCore{
+			Genre:   genre,
+			AnimeId: request.AnimeId,
+		})
+	}
+	return genres
 }

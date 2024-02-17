@@ -10,6 +10,13 @@ type AnimeCore struct {
 	Id        string
 	Title     string
 	Synopsis  string
+	Type      string
+	Episodes  int
+	Premiered string
+	Aired     string
+	Studios   string
+	Duration  string
+	Rating    string
 	Image     string
 	Genre     []GenreCore
 	CreatedAt time.Time

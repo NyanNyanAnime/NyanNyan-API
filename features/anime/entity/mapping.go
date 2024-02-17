@@ -5,11 +5,18 @@ import "nyannyan/features/anime/model"
 // Core To Model
 func MapCoreAnimeToModelAnime(data AnimeCore) model.Anime {
 	return model.Anime{
-		Id:       data.Id,
-		Title:    data.Title,
-		Synopsis: data.Synopsis,
-		Image:    data.Image,
-		Genre:    ListMapCoreGenreToModelGenre(data.Genre),
+		Id:        data.Id,
+		Title:     data.Title,
+		Synopsis:  data.Synopsis,
+		Type:      data.Type,
+		Episodes:  data.Episodes,
+		Premiered: data.Premiered,
+		Aired:     data.Aired,
+		Studios:   data.Studios,
+		Duration:  data.Duration,
+		Rating:    data.Rating,
+		Image:     data.Image,
+		Genre:     ListMapCoreGenreToModelGenre(data.Genre),
 	}
 }
 
@@ -46,6 +53,13 @@ func ModelAnimeToCoreAnime(data model.Anime) AnimeCore {
 		Title:     data.Title,
 		Synopsis:  data.Synopsis,
 		Image:     data.Image,
+		Type:      data.Type,
+		Episodes:  data.Episodes,
+		Premiered: data.Premiered,
+		Aired:     data.Aired,
+		Studios:   data.Studios,
+		Duration:  data.Duration,
+		Rating:    data.Rating,
 		Genre:     ListModelGenreToCoreGenre(data.Genre),
 		CreatedAt: data.CreatedAt,
 		UpdatedAt: data.UpdatedAt,
