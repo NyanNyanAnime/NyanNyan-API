@@ -116,7 +116,9 @@ func (ar *animeRepository) GetAllAnime(page, limit int, search string) ([]entity
 	query := ar.db.Model(&model.Anime{}).Preload("Genre")
 
 	if search != "" {
-		query = query.Where("title LIKE ? or genre LIKE ? ", "%"+search+"%", "%"+search+"%")
+		query = query.
+			Joins("JOIN genres ON genres.anime_id = animes.id").
+			Where("animes.title LIKE ? OR genres.genre LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
 	var totalCount int64
@@ -125,7 +127,7 @@ func (ar *animeRepository) GetAllAnime(page, limit int, search string) ([]entity
 		return nil, pagination.PageInfo{}, 0, tx.Error
 	}
 
-	query = query.Offset(offset).Limit(limit)
+	query = query.Offset(offset).Limit(limit).Group("animes.id")
 	tx = query.Find(&dataAnime)
 	if tx.Error != nil {
 		return nil, pagination.PageInfo{}, 0, tx.Error
@@ -136,6 +138,7 @@ func (ar *animeRepository) GetAllAnime(page, limit int, search string) ([]entity
 
 	return dataResponse, pageInfo, int(totalCount), nil
 }
+
 
 // GetAnimeById implements entity.AnimeRepositoryInterface.
 func (ar *animeRepository) GetAnimeById(id string) (entity.AnimeCore, error) {

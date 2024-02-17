@@ -7,6 +7,9 @@ import (
 	"nyannyan/utils/constanta"
 	"nyannyan/utils/pagination"
 	"nyannyan/utils/validation"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type animeService struct {
@@ -21,13 +24,20 @@ func NewAnimeService(anime entity.AnimeRepositoryInterface) entity.AnimeServiceI
 
 // CreateGenre implements entity.AnimeServiceInterface.
 func (as *animeService) CreateGenre(data []entity.GenreCore) error {
+	var updatedGenres []entity.GenreCore
+
 	for _, genre := range data {
 		if errEmpty := validation.CheckDataEmpty(genre.Genre, genre.AnimeId); errEmpty != nil {
 			return errEmpty
 		}
+
+		tc := cases.Title(language.English)
+		genre.Genre = tc.String(genre.Genre)
+
+		updatedGenres = append(updatedGenres, genre)
 	}
 
-	errCreate := as.animeRepository.CreateGenre(data)
+	errCreate := as.animeRepository.CreateGenre(updatedGenres)
 	if errCreate != nil {
 		return errCreate
 	}
@@ -84,6 +94,9 @@ func (as *animeService) CreateAnime(image *multipart.FileHeader, data entity.Ani
 		return errors.New("image file size should be less than 10 MB")
 	}
 
+	tc := cases.Title(language.English)
+	data.Title = tc.String(data.Title)
+
 	errCreate := as.animeRepository.CreateAnime(image, data)
 	if errCreate != nil {
 		return errCreate
@@ -113,6 +126,8 @@ func (as *animeService) GetAllAnime(page, limit int, search string) ([]entity.An
 	}
 
 	page, limit = validation.ValidateCountLimitAndPage(page, limit)
+
+	search = cases.Title(language.English).String(search)
 
 	animeCores, pageInfo, count, err := as.animeRepository.GetAllAnime(page, limit, search)
 	if err != nil {
