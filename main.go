@@ -14,8 +14,8 @@ func main() {
 	e := echo.New()
 
 	cfg := config.InitConfig()
-	dbMysql := database.InitDBMysql(cfg)
-	database.InitMigrationMysql(dbMysql)
+	dbMysql := database.InitDBPostgres(cfg)
+	database.InitMigrationPostgre(dbMysql)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
