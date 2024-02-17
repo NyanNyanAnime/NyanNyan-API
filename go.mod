@@ -16,20 +16,7 @@ require (
 	gorm.io/gorm v1.25.7
 )
 
-require (
-	cloud.google.com/go/storage v1.38.0
-	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/cloudinary/cloudinary-go/v2 v2.7.0
-	github.com/google/uuid v1.6.0
-	github.com/gorilla/schema v1.2.1
-	github.com/joho/godotenv v1.5.1
-	github.com/labstack/echo/v4 v4.11.4
-	github.com/sirupsen/logrus v1.9.3
-	google.golang.org/api v0.162.0
-	gorm.io/driver/mysql v1.5.4
-	gorm.io/driver/postgres v1.5.6
-	gorm.io/gorm v1.25.7
-)
+require gorm.io/driver/postgres v1.5.6
 
 require (
 	cloud.google.com/go v0.112.0 // indirect
@@ -61,12 +48,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.47.0 // indirect
-	go.opentelemetry.io/otel v1.22.0 // indirect
-	go.opentelemetry.io/otel/metric v1.22.0 // indirect
-	go.opentelemetry.io/otel/trace v1.22.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/oauth2 v0.16.0 // indirect
 	go.opentelemetry.io/otel v1.23.0 // indirect
 	go.opentelemetry.io/otel/metric v1.23.0 // indirect
 	go.opentelemetry.io/otel/trace v1.23.0 // indirect
